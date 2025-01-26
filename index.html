@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lấy vị trí người dùng</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f8ff;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .status {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>Nhấn nút để gửi vị trí</h1>
+    <button onclick="getLocation()">Lấy vị trí</button>
+    <div class="status"></div>
+
+    <script>
+        function getLocation() {
+            const statusDiv = document.querySelector('.status');
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(position => {
+                    const latitude = position.coords.latitude;
+                    const longitude = position.coords.longitude;
+
+                    // Gửi dữ liệu vị trí tới backend
+                    fetch('https://your-backend-url.com/save-location', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            latitude: latitude,
+                            longitude: longitude,
+                            timestamp: new Date().toISOString()
+                        }),
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            statusDiv.innerText = "Vị trí đã được gửi thành công!";
+                        })
+                        .catch(error => {
+                            console.error('Lỗi khi gửi vị trí:', error);
+                            statusDiv.innerText = "Không thể gửi vị trí.";
+                        });
+                }, error => {
+                    statusDiv.innerText = "Không thể lấy vị trí: " + error.message;
+                });
+            } else {
+                alert("Trình duyệt của bạn không hỗ trợ định vị.");
+            }
+        }
+    </script>
+</body>
+</html>
